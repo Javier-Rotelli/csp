@@ -1,0 +1,6 @@
+futures==3.0.5
+gi==1.2
+livestreamer==1.12.2
+requests==2.11.1
+singledispatch==3.4.0.3
+six==1.10.0
