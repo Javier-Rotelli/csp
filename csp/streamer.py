@@ -1,25 +1,26 @@
 import numpy as np
 import cv2
-import pytesseract
+from tesserwrap import Tesseract
 from PIL import Image
-from crop_morphology import process_image
 
+import ocr
 
-cap = cv2.VideoCapture('test-file.mp4')
+cap = cv2.VideoCapture('test-file-trimmed.mp4')
+tr = Tesseract(datadir='/usr/local/share')
+tr.set_page_seg_mode(mode=7)
+tr.set_variable('load_system_dawg', 'false')
+tr.set_variable('load_freq_dawg', 'false')
 
 count = 0
 while cap.isOpened():
     ret, frame = cap.read()
-    cropped = frame[45:70, 90:425]
-    gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY)
 
-    cropped_text = process_image(gray)
-    # th3 = cv2.adaptiveThreshold(cropped_text, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-    #                             cv2.THRESH_BINARY, 11, 2)
-    cv2.imshow('frame', cropped_text)
-    if count % 240 == 0:
-        print(pytesseract.image_to_string(Image.fromarray(cropped_text), config="-psm 7 -load_system_dawg 0 -load_freq_dawg 0"))
-        # cv2.imwrite("frame%d.jpg" % count, cropped_text)  # save frame as JPEG file
+    cropped = frame[51:68, 90:410]
+    cv2.imshow('cropped', cropped)
+    binary = ocr.ocr(cropped)
+    if count % 5 == 0:
+        print(tr.ocr_image(Image.fromarray(binary)))
+        # cv2.imwrite("frame%d.jpg" % count, cropped)  # save frame as JPEG file
     count += 1
     k = cv2.waitKey(30) & 0xff
     if k == 27:
